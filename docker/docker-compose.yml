@@ -71,5 +71,25 @@ services:
       timeout: 5s
       retries: 5
 
+  chrysantha-sync:
+    build:
+      context: ../tools/akshare-sync
+      dockerfile: Dockerfile
+    container_name: chrysantha-sync
+    restart: unless-stopped
+    init: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - ../.env
+    depends_on:
+      ghostfolio:
+        condition: service_healthy
+    volumes:
+      - chrysantha-sync-logs:/var/log
+
 volumes:
   postgres:
+  chrysantha-sync-logs:

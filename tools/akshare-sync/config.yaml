@@ -1,0 +1,18 @@
+# Chrysantha — Advanced Configuration (optional)
+# ==============================================
+# Symbols are configured via CHRYSANTHA_SYMBOLS env var in ../.env
+# e.g. CHRYSANTHA_SYMBOLS=SH600519,SZ002594,SH600036
+#
+# If CHRYSANTHA_SYMBOLS is not set, the script auto-discovers
+# A-share symbols from your Ghostfolio market data.
+
+ghostfolio:
+  base_url: "http://ghostfolio:3333/api/v1"
+  access_token: "${GHOSTFOLIO_ACCESS_TOKEN}"
+
+schedule:
+  interval_minutes: 30
+
+logging:
+  level: "INFO"
+  file: "/var/log/akshare-sync.log"

@@ -1,0 +1,31 @@
+:host {
+  display: block;
+
+  .buffer-card {
+    --buffer-accent: var(--chrysantha-buffer, #2e7d32);
+    border-left: 3px solid var(--buffer-accent);
+
+    .buffer-icon {
+      color: var(--buffer-accent);
+      font-size: 1.25rem;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+
+    .buffer-total {
+      font-size: 1.5rem;
+      font-weight: 600;
+      padding: 0.5rem 0;
+    }
+
+    .buffer-breakdown {
+      border-top: 1px solid rgba(var(--dark-dividers, 0, 0, 0, 0.12));
+      font-size: 0.875rem;
+      padding-top: 0.5rem;
+
+      .buffer-account-row {
+        padding: 0.25rem 0;
+      }
+    }
+  }
+}

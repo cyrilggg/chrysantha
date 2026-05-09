@@ -1,0 +1,50 @@
+<mat-card appearance="outlined" class="managed-card mb-3">
+  <mat-card-header>
+    <mat-card-title-group>
+      <mat-card-title>
+        <ion-icon
+          class="managed-icon"
+          name="people-outline"
+        />
+        <ng-container i18n>代管资产</ng-container>
+      </mat-card-title>
+      <mat-card-subtitle i18n
+        >委托资金水位监控</mat-card-subtitle
+      >
+    </mat-card-title-group>
+  </mat-card-header>
+  <mat-card-content>
+    @if (hasManagedAccounts && managedTotal !== undefined) {
+      <div class="managed-total">
+        <gf-value
+          [isCurrency]="true"
+          [locale]="locale"
+          [precision]="precision"
+          [unit]="baseCurrency"
+          [value]="managedTotal"
+        />
+      </div>
+      <div class="managed-breakdown mt-2">
+        @for (account of managedAccounts; track account.name) {
+          <div class="managed-account-row d-flex justify-content-between">
+            <span class="text-truncate managed-account-label">
+              <span class="managed-dot"></span>
+              {{ account.name }}
+            </span>
+            <gf-value
+              [isCurrency]="true"
+              [locale]="locale"
+              [precision]="precision"
+              [unit]="account.currency || baseCurrency"
+              [value]="account.balance"
+            />
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="text-muted text-center py-3" i18n>
+        暂无代管资产。设置 Mom_ 前缀或 #ForMom 标签的账户以激活此卡片。
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

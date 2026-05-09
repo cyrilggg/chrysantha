@@ -1,0 +1,47 @@
+<mat-card appearance="outlined" class="buffer-card mb-3">
+  <mat-card-header>
+    <mat-card-title-group>
+      <mat-card-title>
+        <ion-icon
+          class="buffer-icon"
+          name="shield-checkmark-outline"
+        />
+        <ng-container i18n>流动性缓冲垫</ng-container>
+      </mat-card-title>
+      <mat-card-subtitle i18n
+        >应急储备 · 心理安全区</mat-card-subtitle
+      >
+    </mat-card-title-group>
+  </mat-card-header>
+  <mat-card-content>
+    @if (hasBufferAccounts && bufferTotal !== undefined) {
+      <div class="buffer-total">
+        <gf-value
+          [isCurrency]="true"
+          [locale]="locale"
+          [precision]="precision"
+          [unit]="baseCurrency"
+          [value]="bufferTotal"
+        />
+      </div>
+      <div class="buffer-breakdown mt-2">
+        @for (account of bufferAccounts; track account.name) {
+          <div class="buffer-account-row d-flex justify-content-between">
+            <span class="text-muted text-truncate">{{ account.name }}</span>
+            <gf-value
+              [isCurrency]="true"
+              [locale]="locale"
+              [precision]="precision"
+              [unit]="account.currency || baseCurrency"
+              [value]="account.balance"
+            />
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="text-muted text-center py-3" i18n>
+        暂无缓冲垫账户。设置 #Reserve 标签或 Cash_ 前缀的账户以激活此卡片。
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

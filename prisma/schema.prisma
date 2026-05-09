@@ -29,6 +29,7 @@ model Account {
   activities Order[]
   balance    Float            @default(0)
   balances   AccountBalance[]
+  category   AccountCategory? @default(INVESTMENT)
   comment    String?
   createdAt  DateTime         @default(now())
   currency   String?
@@ -42,6 +43,7 @@ model Account {
   userId     String
 
   @@id([id, userId])
+  @@index([category])
   @@index([currency])
   @@index([id])
   @@index([isExcluded])
@@ -353,6 +355,14 @@ enum Type {
   INTEREST
   LIABILITY
   SELL
+}
+
+enum AccountCategory {
+  BANK
+  CREDIT
+  INVESTMENT
+  OTHER
+  PAYMENT
 }
 
 enum ViewMode {

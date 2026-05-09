@@ -192,6 +192,52 @@
   --palette-warn-contrast-700: 255, 255, 255, 1;
   --palette-warn-contrast-800: 255, 255, 255, 1;
   --palette-warn-contrast-900: 255, 255, 255, 1;
+
+  // ── Chrysantha: Unified Asset Dashboard Color System ──
+  // Account prefix / tag-based semantic colors
+  --chrysantha-buffer: #2e7d32;       // #Reserve · Cash_  prefix — 流动性缓冲垫
+  --chrysantha-buffer-light: #e8f5e9;
+  --chrysantha-managed: #e65100;      // #ForMom · Mom_  prefix — 代管资产
+  --chrysantha-managed-light: #fff3e0;
+  --chrysantha-investment: #1565c0;   // #Investment — 权益类投资
+  --chrysantha-investment-light: #e3f2fd;
+  --chrysantha-personal: #546e7a;     // #Personal — 个人资产
+  --chrysantha-personal-light: #eceff1;
+
+  // Dark theme overrides
+  .theme-dark & {
+    --chrysantha-buffer: #66bb6a;
+    --chrysantha-buffer-light: #1b5e20;
+    --chrysantha-managed: #ff9800;
+    --chrysantha-managed-light: #e65100;
+    --chrysantha-investment: #42a5f5;
+    --chrysantha-investment-light: #0d47a1;
+    --chrysantha-personal: #90a4ae;
+    --chrysantha-personal-light: #37474f;
+  }
+}
+
+// ── Chrysantha: Account prefix color utility classes ──
+.chrysantha-account--buffer {
+  border-left: 3px solid var(--chrysantha-buffer) !important;
+}
+
+.chrysantha-account--managed {
+  border-left: 3px solid var(--chrysantha-managed) !important;
+}
+
+.chrysantha-account--investment {
+  border-left: 3px solid var(--chrysantha-investment) !important;
+}
+
+.chrysantha-tag--reserve {
+  background-color: var(--chrysantha-buffer-light) !important;
+  color: var(--chrysantha-buffer) !important;
+}
+
+.chrysantha-tag--managed {
+  background-color: var(--chrysantha-managed-light) !important;
+  color: var(--chrysantha-managed) !important;
 }
 
 body {

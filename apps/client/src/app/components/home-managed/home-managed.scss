@@ -1,0 +1,46 @@
+:host {
+  display: block;
+
+  .managed-card {
+    --managed-accent: var(--chrysantha-managed, #e65100);
+    border-left: 3px solid var(--managed-accent);
+
+    .managed-icon {
+      color: var(--managed-accent);
+      font-size: 1.25rem;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+
+    .managed-total {
+      font-size: 1.5rem;
+      font-weight: 600;
+      padding: 0.5rem 0;
+    }
+
+    .managed-breakdown {
+      border-top: 1px solid rgba(var(--dark-dividers, 0, 0, 0, 0.12));
+      font-size: 0.875rem;
+      padding-top: 0.5rem;
+
+      .managed-account-row {
+        padding: 0.25rem 0;
+
+        .managed-account-label {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          .managed-dot {
+            background: var(--managed-accent);
+            border-radius: 50%;
+            display: inline-block;
+            height: 8px;
+            min-width: 8px;
+            width: 8px;
+          }
+        }
+      }
+    }
+  }
+}

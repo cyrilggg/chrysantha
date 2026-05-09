@@ -1,3 +1,5 @@
+import { GfHomeBufferComponent } from '@ghostfolio/client/components/home-buffer/home-buffer.component';
+import { GfHomeManagedComponent } from '@ghostfolio/client/components/home-managed/home-managed.component';
 import { GfPortfolioPerformanceComponent } from '@ghostfolio/client/components/portfolio-performance/portfolio-performance.component';
 import { LayoutService } from '@ghostfolio/client/core/layout.service';
 import { ImpersonationStorageService } from '@ghostfolio/client/services/impersonation-storage.service';
@@ -28,6 +30,8 @@ import { DeviceDetectorService } from 'ngx-device-detector';
 
 @Component({
   imports: [
+    GfHomeBufferComponent,
+    GfHomeManagedComponent,
     GfLineChartComponent,
     GfPortfolioPerformanceComponent,
     MatButtonModule,
@@ -58,6 +62,10 @@ export class GfHomeOverviewComponent implements OnInit {
   public showDetails = false;
   public unit: string;
   public user: User;
+
+  public get locale() {
+    return this.user?.settings?.locale;
+  }
 
   public constructor(
     private changeDetectorRef: ChangeDetectorRef,
