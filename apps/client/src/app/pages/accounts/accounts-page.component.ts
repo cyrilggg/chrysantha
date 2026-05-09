@@ -273,6 +273,7 @@ export class GfAccountsPageComponent implements OnInit {
       data: {
         account: {
           balance: 0,
+          category: 'INVESTMENT',
           comment: null,
           currency: this.user?.settings?.baseCurrency,
           id: null,

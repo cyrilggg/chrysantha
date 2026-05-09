@@ -90,6 +90,7 @@ export class ExportService {
         ({
           balance,
           balances,
+          category,
           comment,
           currency,
           id,
@@ -107,6 +108,7 @@ export class ExportService {
             balances: balances.map(({ date, value }) => {
               return { date: date.toISOString(), value };
             }),
+            category,
             comment,
             currency,
             id,

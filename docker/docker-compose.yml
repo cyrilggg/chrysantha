@@ -1,7 +1,9 @@
 name: ghostfolio
 services:
   ghostfolio:
-    image: docker.io/ghostfolio/ghostfolio:latest
+    build:
+      context: ..
+      dockerfile: Dockerfile
     container_name: ghostfolio
     restart: unless-stopped
     init: true

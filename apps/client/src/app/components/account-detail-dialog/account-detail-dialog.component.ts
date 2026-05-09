@@ -2,7 +2,6 @@ import { GfInvestmentChartComponent } from '@ghostfolio/client/components/invest
 import { UserService } from '@ghostfolio/client/services/user/user.service';
 import { NUMERICAL_PRECISION_THRESHOLD_6_FIGURES } from '@ghostfolio/common/config';
 import { CreateAccountBalanceDto } from '@ghostfolio/common/dtos';
-import { AccountCategory } from '@ghostfolio/common/enums';
 import { DATE_FORMAT, downloadAsFile } from '@ghostfolio/common/helper';
 import {
   AccountBalancesResponse,

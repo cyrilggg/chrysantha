@@ -11,6 +11,7 @@ import {
   OnDestroy,
   ViewChild
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
   ArcElement,
   Chart,
@@ -39,7 +40,7 @@ const CATEGORY_COLORS: Record<AccountCategory, string> = {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgxSkeletonLoaderModule],
+  imports: [CommonModule, NgxSkeletonLoaderModule],
   selector: 'gf-account-distribution-chart',
   styleUrls: ['./account-distribution-chart.component.scss'],
   templateUrl: './account-distribution-chart.component.html'
@@ -96,7 +97,7 @@ export class GfAccountDistributionChartComponent implements OnChanges, OnDestroy
       datasets: [
         {
           backgroundColor: entries.map(([cat]) => CATEGORY_COLORS[cat] || 'rgba(200, 200, 200, 0.8)'),
-          borderColor: entries.map(() => getBackgroundColor()),
+          borderColor: entries.map(() => getBackgroundColor('LIGHT')),
           borderWidth: 2,
           data: entries.map(([, value]) => value)
         }
@@ -118,7 +119,7 @@ export class GfAccountDistributionChartComponent implements OnChanges, OnDestroy
         plugins: {
           legend: {
             display: true,
-            labels: { color: getTextColor() },
+            labels: { color: getTextColor('LIGHT') },
             position: 'bottom'
           },
           tooltip: {

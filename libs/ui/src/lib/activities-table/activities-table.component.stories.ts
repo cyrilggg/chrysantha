@@ -41,6 +41,7 @@ const activities: Activity[] = [
     userId: '081aa387-487d-4438-83a4-3060eb2a016e',
     account: {
       balance: 150.2,
+      category: 'INVESTMENT' as const,
       comment: null,
       createdAt: new Date('2025-05-31T13:00:13.940Z'),
       currency: 'USD',
@@ -108,6 +109,7 @@ const activities: Activity[] = [
     userId: '081aa387-487d-4438-83a4-3060eb2a016e',
     account: {
       balance: 150.2,
+      category: 'INVESTMENT' as const,
       comment: null,
       createdAt: new Date('2025-05-31T13:00:13.940Z'),
       currency: 'USD',
@@ -175,6 +177,7 @@ const activities: Activity[] = [
     userId: '081aa387-487d-4438-83a4-3060eb2a016e',
     account: {
       balance: 150.2,
+      category: 'INVESTMENT' as const,
       comment: null,
       createdAt: new Date('2025-05-31T13:00:13.940Z'),
       currency: 'USD',
@@ -242,6 +245,7 @@ const activities: Activity[] = [
     userId: '081aa387-487d-4438-83a4-3060eb2a016e',
     account: {
       balance: 150.2,
+      category: 'INVESTMENT' as const,
       comment: null,
       createdAt: new Date('2025-05-31T13:00:13.940Z'),
       currency: 'USD',
@@ -309,6 +313,7 @@ const activities: Activity[] = [
     userId: '081aa387-487d-4438-83a4-3060eb2a016e',
     account: {
       balance: 150.2,
+      category: 'INVESTMENT' as const,
       comment: null,
       createdAt: new Date('2025-05-31T13:00:13.940Z'),
       currency: 'USD',
