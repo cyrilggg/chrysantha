@@ -239,4 +239,21 @@ export class SymbolService {
       return null;
     }
   }
+
+  public async getManualAShares() {
+    const profiles = await this.prismaService.symbolProfile.findMany({
+      where: { dataSource: DataSource.MANUAL },
+      select: { symbol: true, name: true, currency: true }
+    });
+
+    const aSharePattern = /^(SH|SZ)\d{6}$/i;
+
+    return profiles
+      .filter((p) => aSharePattern.test(p.symbol))
+      .map((p) => ({
+        currency: p.currency,
+        name: p.name ?? p.symbol,
+        symbol: p.symbol
+      }));
+  }
 }

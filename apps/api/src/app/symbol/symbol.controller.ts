@@ -61,7 +61,17 @@ export class SymbolController {
   }
 
   /**
-   * Must be after /lookup
+   * Auto-discovery endpoint for chrysantha-sync.
+   * Must be before /:dataSource/:symbol route.
+   */
+  @Get('manual-a-shares')
+  @UseGuards(AuthGuard('jwt'), HasPermissionGuard)
+  public async getManualAShares() {
+    return this.symbolService.getManualAShares();
+  }
+
+  /**
+   * Must be after /lookup and /manual-a-shares
    */
   @Get(':dataSource/:symbol')
   @UseInterceptors(TransformDataSourceInRequestInterceptor)

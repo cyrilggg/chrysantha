@@ -178,28 +178,24 @@ class GhostfolioClient:
     def discover_a_share_symbols(self) -> List[dict]:
         """
         Auto-discover A-share symbols from Ghostfolio.
-        Queries admin market-data endpoint and filters for MANUAL dataSource
-        symbols matching SH/SZ pattern.
+        Queries the manual-a-shares endpoint (no admin required).
         """
         if not self.jwt_token and not self.authenticate():
             return []
 
         try:
             resp = self.session.get(
-                f"{self.base_url}/admin/market-data",
+                f"{self.base_url}/symbol/manual-a-shares",
                 headers=self._headers(),
                 timeout=15,
             )
-            if resp.status_code == 403:
-                self.logger.info("Admin access denied, skipping auto-discovery")
-                return []
             resp.raise_for_status()
 
             data = resp.json()
             symbols = []
             seen = set()
 
-            for item in data.get("marketData", []):
+            for item in data:
                 symbol = item.get("symbol", "")
                 if A_SHARE_PATTERN.match(symbol) and symbol not in seen:
                     seen.add(symbol)
