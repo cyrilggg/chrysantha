@@ -1,4 +1,5 @@
+import { AccountCategory } from './account-category.type';
 import { ConfirmationDialogType } from './confirmation-dialog.type';
 import { SubscriptionType } from './subscription-type.type';
 
-export { ConfirmationDialogType, SubscriptionType };
+export { AccountCategory, ConfirmationDialogType, SubscriptionType };

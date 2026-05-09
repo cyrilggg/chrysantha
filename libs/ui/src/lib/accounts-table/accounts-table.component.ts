@@ -60,6 +60,7 @@ export class GfAccountsTableComponent {
   public readonly showActivitiesCount = input(true);
   public readonly showAllocationInPercentage = input<boolean>();
   public readonly showBalance = input(true);
+  public readonly showCategory = input(true);
   public readonly showFooter = input(true);
   public readonly showValue = input(true);
   public readonly showValueInBaseCurrency = input(true);
@@ -76,6 +77,10 @@ export class GfAccountsTableComponent {
 
   protected readonly displayedColumns = computed(() => {
     const columns = ['status', 'account', 'platform'];
+
+    if (this.showCategory()) {
+      columns.push('category');
+    }
 
     if (this.showActivitiesCount()) {
       columns.push('activitiesCount');

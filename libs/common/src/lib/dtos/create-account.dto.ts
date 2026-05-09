@@ -1,8 +1,10 @@
+import { AccountCategory } from '@ghostfolio/common/enums';
 import { IsCurrencyCode } from '@ghostfolio/common/validators/is-currency-code';
 
 import { Transform, TransformFnParams } from 'class-transformer';
 import {
   IsBoolean,
+  IsEnum,
   IsNumber,
   IsOptional,
   IsString,
@@ -13,6 +15,10 @@ import { isString } from 'lodash';
 export class CreateAccountDto {
   @IsNumber()
   balance: number;
+
+  @IsEnum(AccountCategory)
+  @IsOptional()
+  category?: AccountCategory;
 
   @IsOptional()
   @IsString()

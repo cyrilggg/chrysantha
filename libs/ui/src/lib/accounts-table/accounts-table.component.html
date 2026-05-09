@@ -115,6 +115,35 @@
       ></td>
     </ng-container>
 
+    <ng-container matColumnDef="category">
+      <th
+        *matHeaderCellDef
+        class="d-none d-lg-table-cell px-1"
+        mat-header-cell
+        mat-sort-header
+      >
+        <ng-container i18n>Category</ng-container>
+      </th>
+      <td
+        *matCellDef="let element"
+        class="d-none d-lg-table-cell px-1"
+        mat-cell
+      >
+        @switch (element.category) {
+          @case ('BANK') { <ng-container i18n>Bank</ng-container> }
+          @case ('PAYMENT') { <ng-container i18n>Payment</ng-container> }
+          @case ('INVESTMENT') { <ng-container i18n>Investment</ng-container> }
+          @case ('CREDIT') { <ng-container i18n>Credit Card</ng-container> }
+          @default { <ng-container i18n>Other</ng-container> }
+        }
+      </td>
+      <td
+        *matFooterCellDef
+        class="d-none d-lg-table-cell px-1"
+        mat-footer-cell
+      ></td>
+    </ng-container>
+
     <ng-container matColumnDef="activitiesCount">
       <th
         *matHeaderCellDef

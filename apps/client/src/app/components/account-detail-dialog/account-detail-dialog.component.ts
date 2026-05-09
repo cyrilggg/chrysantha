@@ -2,6 +2,7 @@ import { GfInvestmentChartComponent } from '@ghostfolio/client/components/invest
 import { UserService } from '@ghostfolio/client/services/user/user.service';
 import { NUMERICAL_PRECISION_THRESHOLD_6_FIGURES } from '@ghostfolio/common/config';
 import { CreateAccountBalanceDto } from '@ghostfolio/common/dtos';
+import { AccountCategory } from '@ghostfolio/common/enums';
 import { DATE_FORMAT, downloadAsFile } from '@ghostfolio/common/helper';
 import {
   AccountBalancesResponse,
@@ -79,6 +80,7 @@ export class GfAccountDetailDialogComponent implements OnInit {
   protected activitiesCount: number;
   protected balance: number;
   protected balancePrecision = 2;
+  protected category: string | null;
   protected currency: string | null;
   protected dataSource: MatTableDataSource<Activity>;
   protected dividendInBaseCurrency: number;
@@ -90,6 +92,7 @@ export class GfAccountDetailDialogComponent implements OnInit {
   protected holdings: PortfolioPosition[];
   protected interestInBaseCurrency: number;
   protected interestInBaseCurrencyPrecision = 2;
+  protected isInvestment: boolean;
   protected isLoadingActivities: boolean;
   protected isLoadingChart: boolean;
   protected name: string | null;
@@ -220,6 +223,7 @@ export class GfAccountDetailDialogComponent implements OnInit {
         ({
           activitiesCount,
           balance,
+          category,
           currency,
           dividendInBaseCurrency,
           interestInBaseCurrency,
@@ -237,6 +241,10 @@ export class GfAccountDetailDialogComponent implements OnInit {
           ) {
             this.balancePrecision = 0;
           }
+
+          this.category = category;
+          this.isInvestment =
+            !category || category === 'INVESTMENT';
 
           this.currency = currency;
           this.dividendInBaseCurrency = dividendInBaseCurrency;
@@ -275,6 +283,13 @@ export class GfAccountDetailDialogComponent implements OnInit {
           this.name = name;
           this.platformName = platform?.name ?? '-';
           this.valueInBaseCurrency = valueInBaseCurrency;
+
+          if (this.isInvestment) {
+            this.fetchChart();
+            this.fetchPortfolioHoldings();
+          } else {
+            this.isLoadingChart = false;
+          }
 
           this.changeDetectorRef.markForCheck();
         }
@@ -377,7 +392,5 @@ export class GfAccountDetailDialogComponent implements OnInit {
   private initialize() {
     this.fetchAccount();
     this.fetchActivities();
-    this.fetchChart();
-    this.fetchPortfolioHoldings();
   }
 }

@@ -1,0 +1,13 @@
+@if (isLoading) {
+  <ngx-skeleton-loader
+    animation="pulse"
+    [theme]="{
+      height: '200px',
+      width: '100%'
+    }"
+  />
+}
+<canvas
+  #chartCanvas
+  [ngStyle]="{ display: isLoading ? 'none' : 'block' }"
+></canvas>

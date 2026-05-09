@@ -19,16 +19,18 @@
       </div>
     </div>
 
-    <div class="chart-container mb-3">
-      <gf-investment-chart
-        class="h-100"
-        [currency]="user?.settings?.baseCurrency"
-        [historicalDataItems]="historicalDataItems"
-        [isInPercentage]="showValuesInPercentage()"
-        [isLoading]="isLoadingChart"
-        [locale]="user?.settings?.locale"
-      />
-    </div>
+    @if (isInvestment) {
+      <div class="chart-container mb-3">
+        <gf-investment-chart
+          class="h-100"
+          [currency]="user?.settings?.baseCurrency"
+          [historicalDataItems]="historicalDataItems"
+          [isInPercentage]="showValuesInPercentage()"
+          [isLoading]="isLoadingChart"
+          [locale]="user?.settings?.locale"
+        />
+      </div>
+    }
 
     <div class="mb-3 row">
       <div class="col-6 mb-3">
@@ -43,42 +45,58 @@
           >Cash Balance</gf-value
         >
       </div>
-      <div class="col-6 mb-3">
-        <gf-value
-          i18n
-          size="medium"
-          [isCurrency]="true"
-          [locale]="user?.settings?.locale"
-          [precision]="equityPrecision"
-          [unit]="currency"
-          [value]="equity"
-          >Equity</gf-value
-        >
-      </div>
-      <div class="col-6 mb-3">
-        <gf-value
-          i18n
-          size="medium"
-          [isCurrency]="true"
-          [locale]="user?.settings?.locale"
-          [precision]="interestInBaseCurrencyPrecision"
-          [unit]="user?.settings?.baseCurrency"
-          [value]="interestInBaseCurrency"
-          >Interest</gf-value
-        >
-      </div>
-      <div class="col-6 mb-3">
-        <gf-value
-          i18n
-          size="medium"
-          [isCurrency]="true"
-          [locale]="user?.settings?.locale"
-          [precision]="dividendInBaseCurrencyPrecision"
-          [unit]="user?.settings?.baseCurrency"
-          [value]="dividendInBaseCurrency"
-          >Dividend</gf-value
-        >
-      </div>
+      @if (isInvestment) {
+        <div class="col-6 mb-3">
+          <gf-value
+            i18n
+            size="medium"
+            [isCurrency]="true"
+            [locale]="user?.settings?.locale"
+            [precision]="equityPrecision"
+            [unit]="currency"
+            [value]="equity"
+            >Equity</gf-value
+          >
+        </div>
+        <div class="col-6 mb-3">
+          <gf-value
+            i18n
+            size="medium"
+            [isCurrency]="true"
+            [locale]="user?.settings?.locale"
+            [precision]="interestInBaseCurrencyPrecision"
+            [unit]="user?.settings?.baseCurrency"
+            [value]="interestInBaseCurrency"
+            >Interest</gf-value
+          >
+        </div>
+        <div class="col-6 mb-3">
+          <gf-value
+            i18n
+            size="medium"
+            [isCurrency]="true"
+            [locale]="user?.settings?.locale"
+            [precision]="dividendInBaseCurrencyPrecision"
+            [unit]="user?.settings?.baseCurrency"
+            [value]="dividendInBaseCurrency"
+            >Dividend</gf-value
+          >
+        </div>
+      }
+      @if (!isInvestment) {
+        <div class="col-6 mb-3">
+          <span class="d-block" i18n>Category</span>
+          <span class="d-block h4 mb-0">
+            @switch (category) {
+              @case ('BANK') { <ng-container i18n>Bank</ng-container> }
+              @case ('PAYMENT') { <ng-container i18n>Payment</ng-container> }
+              @case ('CREDIT') { <ng-container i18n>Credit Card</ng-container> }
+              @case ('OTHER') { <ng-container i18n>Other</ng-container> }
+              @default { {{ category }} }
+            }
+          </span>
+        </div>
+      }
       <div class="col-6 mb-3">
         <gf-value i18n size="medium" [value]="activitiesCount"
           >Activities</gf-value
@@ -94,17 +112,19 @@
       [class.d-none]="isLoadingActivities"
       [mat-stretch-tabs]="false"
     >
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <ion-icon name="albums-outline" />
-          <div class="d-none d-sm-block ml-2" i18n>Holdings</div>
-        </ng-template>
-        <gf-holdings-table
-          [hasPermissionToOpenDetails]="false"
-          [holdings]="holdings"
-          [locale]="user?.settings?.locale"
-        />
-      </mat-tab>
+      @if (isInvestment) {
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <ion-icon name="albums-outline" />
+            <div class="d-none d-sm-block ml-2" i18n>Holdings</div>
+          </ng-template>
+          <gf-holdings-table
+            [hasPermissionToOpenDetails]="false"
+            [holdings]="holdings"
+            [locale]="user?.settings?.locale"
+          />
+        </mat-tab>
+      }
       <mat-tab>
         <ng-template mat-tab-label>
           <ion-icon name="swap-vertical-outline" />

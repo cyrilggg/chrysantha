@@ -1,4 +1,5 @@
 import { CreateAccountDto, UpdateAccountDto } from '@ghostfolio/common/dtos';
+import { AccountCategory } from '@ghostfolio/common/enums';
 import { validateObjectForForm } from '@ghostfolio/common/utils';
 import { GfCurrencySelectorComponent } from '@ghostfolio/ui/currency-selector';
 import { GfEntityLogoComponent } from '@ghostfolio/ui/entity-logo';
@@ -24,6 +25,7 @@ import {
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { Platform } from '@prisma/client';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
@@ -43,6 +45,7 @@ import { CreateOrUpdateAccountDialogParams } from './interfaces/interfaces';
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     ReactiveFormsModule
   ],
   selector: 'gf-create-or-update-account-dialog',
@@ -51,6 +54,13 @@ import { CreateOrUpdateAccountDialogParams } from './interfaces/interfaces';
 })
 export class GfCreateOrUpdateAccountDialogComponent {
   protected accountForm: FormGroup;
+  protected categories = [
+    { value: AccountCategory.BANK, label: $localize`Bank` },
+    { value: AccountCategory.PAYMENT, label: $localize`Payment (Alipay/WeChat)` },
+    { value: AccountCategory.INVESTMENT, label: $localize`Investment` },
+    { value: AccountCategory.CREDIT, label: $localize`Credit Card` },
+    { value: AccountCategory.OTHER, label: $localize`Other` }
+  ];
   protected currencies: string[] = [];
   protected filteredPlatforms: Observable<Platform[]> | undefined;
   protected platforms: Platform[] = [];
@@ -69,6 +79,7 @@ export class GfCreateOrUpdateAccountDialogComponent {
     this.accountForm = this.formBuilder.group({
       accountId: [{ disabled: true, value: this.data.account.id }],
       balance: [this.data.account.balance, Validators.required],
+      category: [this.data.account.category || AccountCategory.INVESTMENT, Validators.required],
       comment: [this.data.account.comment],
       currency: [this.data.account.currency, Validators.required],
       isExcluded: [this.data.account.isExcluded],
@@ -127,6 +138,7 @@ export class GfCreateOrUpdateAccountDialogComponent {
   protected async onSubmit() {
     const account: CreateAccountDto | UpdateAccountDto = {
       balance: this.accountForm.get('balance')?.value,
+      category: this.accountForm.get('category')?.value,
       comment: this.accountForm.get('comment')?.value || null,
       currency: this.accountForm.get('currency')?.value,
       id: this.accountForm.get('accountId')?.value,

@@ -34,10 +34,11 @@ import { GfCreateOrUpdateAccountDialogComponent } from './create-or-update-accou
 import { CreateOrUpdateAccountDialogParams } from './create-or-update-account-dialog/interfaces/interfaces';
 import { TransferBalanceDialogParams } from './transfer-balance/interfaces/interfaces';
 import { GfTransferBalanceDialogComponent } from './transfer-balance/transfer-balance-dialog.component';
+import { GfAccountDistributionChartComponent } from './account-distribution-chart/account-distribution-chart.component';
 
 @Component({
   host: { class: 'has-fab page' },
-  imports: [GfAccountsTableComponent, MatButtonModule, RouterModule],
+  imports: [GfAccountDistributionChartComponent, GfAccountsTableComponent, MatButtonModule, RouterModule],
   selector: 'gf-accounts-page',
   styleUrls: ['./accounts-page.scss'],
   templateUrl: './accounts-page.html'
@@ -181,6 +182,7 @@ export class GfAccountsPageComponent implements OnInit {
 
   public openUpdateAccountDialog({
     balance,
+    category,
     comment,
     currency,
     id,
@@ -195,6 +197,7 @@ export class GfAccountsPageComponent implements OnInit {
       data: {
         account: {
           balance,
+          category,
           comment,
           currency,
           id,
