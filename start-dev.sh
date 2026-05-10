@@ -38,7 +38,10 @@ until docker exec gf-redis-dev redis-cli --pass chrysantha_redis_2026 ping 2>/de
 done
 ok "Redis 就绪"
 
-# ── 2. 环境变量（覆盖为 localhost） ────────────────────────
+# ── 2. 环境变量（加载 .env + 覆盖为 localhost） ──────────────
+set -a
+source .env 2>/dev/null || true
+set +a
 export DATABASE_URL="postgresql://chrysantha:chrysantha_pg_2026@localhost:5432/ghostfolio-db?connect_timeout=300"
 export REDIS_HOST="localhost"
 export REDIS_PASSWORD="chrysantha_redis_2026"
@@ -47,6 +50,10 @@ export REDIS_PASSWORD="chrysantha_redis_2026"
 log "推送 Prisma schema..."
 npx prisma db push
 ok "数据库 schema 已同步"
+
+log "填充初始数据..."
+npx prisma db seed
+ok "初始数据已填充"
 
 # ── 4. 启动服务 ──────────────────────────────────────────
 log "启动 API 服务（后台）..."
