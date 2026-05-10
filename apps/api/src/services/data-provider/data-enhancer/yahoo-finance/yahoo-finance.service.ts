@@ -83,8 +83,15 @@ export class YahooFinanceDataEnhancerService implements DataEnhancerInterface {
       }
     }
 
+    // A-share: SH513100 → 513100.SS, SZ002594 → 002594.SZ
+    if (/^SH\d{6}$/.test(aSymbol)) {
+      return aSymbol.replace('SH', '') + '.SS';
+    }
+    if (/^SZ\d{6}$/.test(aSymbol)) {
+      return aSymbol.replace('SZ', '') + '.SZ';
+    }
+
     return aSymbol;
-  }
 
   public async enhance({
     response,

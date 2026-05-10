@@ -196,14 +196,21 @@ export class SymbolService {
     symbol: string,
     code: string
   ): Promise<LookupItem | null> {
+    // Convert SH/SZ prefix to Yahoo Finance format (e.g., SH513100 → 513100.SS)
+    const yahooSymbol = symbol.startsWith('SH')
+      ? code + '.SS'
+      : symbol.startsWith('SZ')
+        ? code + '.SZ'
+        : symbol;
+
     try {
       // Check if already exists
       let profile = await this.prismaService.symbolProfile.findUnique({
-        where: { dataSource_symbol: { dataSource: DataSource.MANUAL, symbol } }
+        where: { dataSource_symbol: { dataSource: DataSource.YAHOO, symbol: yahooSymbol } }
       });
 
       if (!profile) {
-        // Create a new MANUAL profile
+        // Create with YAHOO data source for live prices
         profile = await this.prismaService.symbolProfile.create({
           data: {
             assetClass: 'EQUITY',
@@ -212,9 +219,9 @@ export class SymbolService {
                 ? 'ETF'
                 : 'STOCK',
             currency: 'CNY',
-            dataSource: DataSource.MANUAL,
-            name: code,
-            symbol
+            dataSource: DataSource.YAHOO,
+            name: symbol,
+            symbol: yahooSymbol
           }
         });
       }
@@ -223,13 +230,10 @@ export class SymbolService {
         assetClass: (profile.assetClass ?? 'EQUITY') as AssetClass,
         assetSubClass: (profile.assetSubClass ?? 'STOCK') as AssetSubClass,
         currency: 'CNY',
-        dataProviderInfo: {
-          isPremium: false,
-          name: 'Manual'
-        },
-        dataSource: DataSource.MANUAL,
-        name: profile.name ?? code,
-        symbol
+        dataProviderInfo: { isPremium: false, name: 'Yahoo' },
+        dataSource: DataSource.YAHOO,
+        name: profile.name ?? symbol,
+        symbol: yahooSymbol
       };
     } catch (error) {
       Logger.error(
