@@ -10,6 +10,7 @@ import {
   Get,
   Inject,
   Param,
+  Post,
   Query,
   UseGuards
 } from '@nestjs/common';
@@ -55,5 +56,23 @@ export class AiController {
     });
 
     return { prompt };
+  }
+
+  @Post('trading-analysis/:dataSource/:symbol')
+  @HasPermission(permissions.readAiPrompt)
+  @UseGuards(AuthGuard('jwt'), HasPermissionGuard)
+  public async getTradingAnalysis(
+    @Param('dataSource') dataSource: string,
+    @Param('symbol') symbol: string,
+    @Query('date') date?: string,
+    @Query('debateRounds') debateRounds?: string
+  ) {
+    const analysisDate = date || new Date().toISOString().split('T')[0];
+
+    return this.aiService.callTradingBridge({
+      ticker: symbol,
+      date: analysisDate,
+      debateRounds: debateRounds ? parseInt(debateRounds, 10) : 1
+    });
   }
 }

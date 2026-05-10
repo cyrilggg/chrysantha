@@ -7,13 +7,17 @@ import {
 import { Filter } from '@ghostfolio/common/interfaces';
 import type { AiPromptMode } from '@ghostfolio/common/types';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { generateText } from 'ai';
 import type { ColumnDescriptor } from 'tablemark';
 
+const TRADING_BRIDGE_URL =
+  process.env.TRADING_BRIDGE_URL || 'http://trading-bridge:8000';
+
 @Injectable()
 export class AiService {
+  private readonly logger = new Logger(AiService.name);
   private static readonly HOLDINGS_TABLE_COLUMN_DEFINITIONS: ({
     key:
       | 'ALLOCATION_PERCENTAGE'
@@ -165,5 +169,47 @@ export class AiService {
       'Conclusion: Provide a concise summary highlighting key insights.',
       `Provide your answer in the following language: ${languageCode}.`
     ].join('\n');
+  }
+
+  public async callTradingBridge(params: {
+    ticker: string;
+    date: string;
+    debateRounds?: number;
+    riskRounds?: number;
+  }) {
+    const { ticker, date, debateRounds = 1, riskRounds = 1 } = params;
+
+    this.logger.log(`Calling trading-bridge for ${ticker} on ${date}`);
+
+    const response = await fetch(`${TRADING_BRIDGE_URL}/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ticker,
+        date,
+        debate_rounds: debateRounds,
+        risk_rounds: riskRounds
+      }),
+      signal: AbortSignal.timeout(300000) // 5-min timeout for LLM analysis
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Trading bridge error: ${response.status} ${response.statusText}`
+      );
+    }
+
+    return response.json();
+  }
+
+  public async getTradingBridgeHealth() {
+    try {
+      const response = await fetch(`${TRADING_BRIDGE_URL}/health`, {
+        signal: AbortSignal.timeout(5000)
+      });
+      return response.json();
+    } catch {
+      return { status: 'unavailable' };
+    }
   }
 }
