@@ -10,12 +10,27 @@ npm-debug.log
 
 # IDEs and editors
 /.idea
+.agents/
 .project
 .classpath
 .c9/
 *.launch
 .settings/
 *.sublime-workspace
+
+# AI / Agent tools
+.codex/
+.cursor/*
+!.cursor/rules/
+.gemini/
+.kiro/
+.opencode/
+.pi/
+.qoder/
+.rovodev/
+.sisyphus/
+.trae-cn/
+.trae/
 
 # IDE - VSCode
 .vscode/*
