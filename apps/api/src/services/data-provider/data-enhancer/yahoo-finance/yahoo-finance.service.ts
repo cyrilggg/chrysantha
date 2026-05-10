@@ -92,6 +92,7 @@ export class YahooFinanceDataEnhancerService implements DataEnhancerInterface {
     }
 
     return aSymbol;
+  }
 
   public async enhance({
     response,
