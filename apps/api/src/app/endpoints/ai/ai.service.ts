@@ -14,6 +14,8 @@ import type { ColumnDescriptor } from 'tablemark';
 
 const TRADING_BRIDGE_URL =
   process.env.TRADING_BRIDGE_URL || 'http://trading-bridge:8000';
+const EXECUTOR_BRIDGE_URL =
+  process.env.EXECUTOR_BRIDGE_URL || 'http://executor-bridge:8001';
 
 @Injectable()
 export class AiService {
@@ -205,6 +207,51 @@ export class AiService {
   public async getTradingBridgeHealth() {
     try {
       const response = await fetch(`${TRADING_BRIDGE_URL}/health`, {
+        signal: AbortSignal.timeout(5000)
+      });
+      return response.json();
+    } catch {
+      return { status: 'unavailable' };
+    }
+  }
+
+  public async callExecutorBridge(endpoint: string, body: object) {
+    this.logger.log(`Calling executor-bridge: ${endpoint}`);
+
+    const response = await fetch(`${EXECUTOR_BRIDGE_URL}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30000)
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Executor bridge error: ${response.status} ${response.statusText}`
+      );
+    }
+
+    return response.json();
+  }
+
+  public async getExecutionStatus(executionId: string) {
+    const response = await fetch(
+      `${EXECUTOR_BRIDGE_URL}/execution/${executionId}`,
+      { signal: AbortSignal.timeout(10000) }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Executor bridge error: ${response.status} ${response.statusText}`
+      );
+    }
+
+    return response.json();
+  }
+
+  public async getExecutorBridgeHealth() {
+    try {
+      const response = await fetch(`${EXECUTOR_BRIDGE_URL}/health`, {
         signal: AbortSignal.timeout(5000)
       });
       return response.json();

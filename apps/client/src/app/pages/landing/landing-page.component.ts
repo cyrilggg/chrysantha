@@ -11,7 +11,7 @@ import { GfWorldMapChartComponent } from '@ghostfolio/ui/world-map-chart';
 import { Component, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { format } from 'date-fns';
 import { addIcons } from 'ionicons';
 import {
@@ -20,6 +20,8 @@ import {
   starOutline
 } from 'ionicons/icons';
 import { DeviceDetectorService } from 'ngx-device-detector';
+
+import { TokenStorageService } from '../../services/token-storage.service';
 
 @Component({
   host: { class: 'page' },
@@ -104,16 +106,23 @@ export class GfLandingPageComponent implements OnInit {
     }
   ];
 
+  private devAuthToken: string | undefined;
+
   public constructor(
     private dataService: DataService,
-    private deviceDetectorService: DeviceDetectorService
+    private deviceDetectorService: DeviceDetectorService,
+    private router: Router,
+    private tokenStorageService: TokenStorageService
   ) {
     const {
       countriesOfSubscribers = [],
       demoAuthToken,
+      devAuthToken,
       globalPermissions,
       statistics
     } = this.dataService.fetchInfo();
+
+    this.devAuthToken = devAuthToken;
 
     for (const country of countriesOfSubscribers) {
       this.countriesOfSubscribersMap[country] = {
@@ -149,5 +158,11 @@ export class GfLandingPageComponent implements OnInit {
 
   public ngOnInit() {
     this.deviceType = this.deviceDetectorService.getDeviceInfo().deviceType;
+
+    // Auto-login local dev user via pre-signed JWT from info endpoint
+    if (this.devAuthToken && !this.tokenStorageService.getToken()) {
+      this.tokenStorageService.saveToken(this.devAuthToken, true);
+      this.router.navigate(['/']);
+    }
   }
 }

@@ -6,6 +6,7 @@ import { permissions } from '@ghostfolio/common/permissions';
 import type { AiPromptMode, RequestWithUser } from '@ghostfolio/common/types';
 
 import {
+  Body,
   Controller,
   Get,
   Inject,
@@ -62,7 +63,7 @@ export class AiController {
   @HasPermission(permissions.readAiPrompt)
   @UseGuards(AuthGuard('jwt'), HasPermissionGuard)
   public async getTradingAnalysis(
-    @Param('dataSource') dataSource: string,
+    @Param('dataSource') _dataSource: string,
     @Param('symbol') symbol: string,
     @Query('date') date?: string,
     @Query('debateRounds') debateRounds?: string
@@ -74,5 +75,74 @@ export class AiController {
       date: analysisDate,
       debateRounds: debateRounds ? parseInt(debateRounds, 10) : 1
     });
+  }
+
+  @Post('execute')
+  @HasPermission(permissions.readAiPrompt)
+  @UseGuards(AuthGuard('jwt'), HasPermissionGuard)
+  public async executeTrade(@Body() body: {
+    ticker: string;
+    dataSource?: string;
+    date?: string;
+    signal: string;
+    decision: Record<string, unknown>;
+    reports?: Record<string, unknown>;
+    quantity?: number;
+    price?: number;
+    orderType?: string;
+    stopLoss?: number;
+    accountId?: string;
+    dryRun?: boolean;
+  }) {
+    return this.aiService.callExecutorBridge('/execute', {
+      ticker: body.ticker,
+      data_source: body.dataSource || 'MANUAL',
+      date: body.date || new Date().toISOString().split('T')[0],
+      signal: body.signal,
+      decision: body.decision,
+      reports: body.reports || {},
+      quantity: body.quantity ?? null,
+      price: body.price ?? null,
+      order_type: body.orderType || 'LIMIT',
+      stop_loss: body.stopLoss ?? null,
+      account_id: body.accountId ?? null,
+      dry_run: body.dryRun || false
+    });
+  }
+
+  @Post('auto-execute/:dataSource/:symbol')
+  @HasPermission(permissions.readAiPrompt)
+  @UseGuards(AuthGuard('jwt'), HasPermissionGuard)
+  public async autoExecute(
+    @Param('dataSource') dataSource: string,
+    @Param('symbol') symbol: string,
+    @Query('date') date?: string,
+    @Query('debateRounds') debateRounds?: string,
+    @Query('riskRounds') riskRounds?: string,
+    @Query('confidenceThreshold') confidenceThreshold?: string,
+    @Query('maxPositionPct') maxPositionPct?: string,
+    @Query('accountId') accountId?: string,
+    @Query('dryRun') dryRun?: string
+  ) {
+    const analysisDate = date || new Date().toISOString().split('T')[0];
+
+    return this.aiService.callExecutorBridge('/auto-execute', {
+      ticker: symbol,
+      data_source: dataSource,
+      date: analysisDate,
+      confidence_threshold: confidenceThreshold ? parseFloat(confidenceThreshold) : 0.7,
+      max_position_pct: maxPositionPct ? parseFloat(maxPositionPct) : 0.1,
+      debate_rounds: debateRounds ? parseInt(debateRounds, 10) : 1,
+      risk_rounds: riskRounds ? parseInt(riskRounds, 10) : 1,
+      account_id: accountId ?? null,
+      dry_run: dryRun === 'true'
+    });
+  }
+
+  @Get('execution/:id/status')
+  @HasPermission(permissions.readAiPrompt)
+  @UseGuards(AuthGuard('jwt'), HasPermissionGuard)
+  public async getExecutionStatus(@Param('id') executionId: string) {
+    return this.aiService.getExecutionStatus(executionId);
   }
 }

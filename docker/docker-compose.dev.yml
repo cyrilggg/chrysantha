@@ -18,3 +18,5 @@ services:
 
 volumes:
   postgres:
+    external: true
+    name: ghostfolio_postgres

@@ -3,6 +3,7 @@
 # compiled output
 /out-tsc
 /tmp
+__pycache__/
 
 # dependencies
 /node_modules

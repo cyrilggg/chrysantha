@@ -98,12 +98,14 @@ export class InfoService {
     const [
       benchmarks,
       demoAuthToken,
+      devAuthToken,
       isUserSignupEnabled,
       statistics,
       subscriptionOffer
     ] = await Promise.all([
       this.benchmarkService.getBenchmarkAssetProfiles(),
       this.getDemoAuthToken(),
+      this.getDevAuthToken(),
       this.propertyService.isUserSignupEnabled(),
       this.getStatistics(),
       this.subscriptionService.getSubscriptionOffer({ key: 'default' })
@@ -117,6 +119,7 @@ export class InfoService {
       ...info,
       benchmarks,
       demoAuthToken,
+      devAuthToken,
       globalPermissions,
       isReadOnlyMode,
       statistics,
@@ -175,6 +178,36 @@ export class InfoService {
       return this.jwtService.sign({
         id: demoUserId
       });
+    }
+
+    return undefined;
+  }
+
+  private async getDevAuthToken() {
+    // Auto-login for local dev user — skip if auth token is disabled
+    if (!this.configurationService.get('ENABLE_FEATURE_AUTH_TOKEN')) {
+      return undefined;
+    }
+
+    try {
+      // Try seeded local dev user first, then fallback to any admin user
+      const LOCAL_DEV_USER_ID = '00000000-0000-0000-0000-000000000001';
+      const localDevUser = await this.userService.user({ id: LOCAL_DEV_USER_ID });
+      const adminUser =
+        localDevUser ??
+        (
+          await this.userService.users({
+            where: { role: 'ADMIN' },
+            orderBy: { createdAt: 'asc' },
+            take: 1
+          })
+        )[0];
+
+      if (adminUser) {
+        return this.jwtService.sign({ id: adminUser.id });
+      }
+    } catch {
+      // User doesn't exist yet
     }
 
     return undefined;

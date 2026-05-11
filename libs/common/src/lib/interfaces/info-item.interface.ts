@@ -9,6 +9,7 @@ export interface InfoItem {
   countriesOfSubscribers?: string[];
   currencies: string[];
   demoAuthToken: string;
+  devAuthToken?: string;
   fearAndGreedDataSource?: string;
   globalPermissions: string[];
   isDataGatheringEnabled?: string;

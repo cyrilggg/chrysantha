@@ -90,15 +90,17 @@ def get_graph():
         return _graph_instance
 
     logger.info("Registering chrysantha data vendor...")
-    config = {
-        "llm_provider": LLM_PROVIDER,
-        "deep_think_llm": DEEP_THINK_MODEL,
-        "quick_think_llm": QUICK_THINK_MODEL,
-        "backend_url": BACKEND_URL,
-        "max_debate_rounds": MAX_DEBATE_ROUNDS,
-        "max_risk_discuss_rounds": MAX_RISK_ROUNDS,
-        "output_language": OUTPUT_LANGUAGE,
-    }
+    from tradingagents.default_config import DEFAULT_CONFIG
+
+    config = DEFAULT_CONFIG.copy()
+    config["llm_provider"] = LLM_PROVIDER
+    config["deep_think_llm"] = DEEP_THINK_MODEL
+    config["quick_think_llm"] = QUICK_THINK_MODEL
+    if BACKEND_URL:
+        config["backend_url"] = BACKEND_URL
+    config["max_debate_rounds"] = MAX_DEBATE_ROUNDS
+    config["max_risk_discuss_rounds"] = MAX_RISK_ROUNDS
+    config["output_language"] = OUTPUT_LANGUAGE
     register_chrysantha_vendor(config)
 
     logger.info("Initializing TradingAgentsGraph...")

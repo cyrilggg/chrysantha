@@ -124,6 +124,34 @@ services:
       # Mount TradingAgents source from host (fork: chrysantha-TradingAgents)
       - ${TRADINGAGENTS_HOST_PATH:-../../TradingAgents}:/app/TradingAgents:ro
 
+  executor-bridge:
+    build:
+      context: ../tools/executor-bridge
+      dockerfile: Dockerfile
+    container_name: executor-bridge
+    restart: unless-stopped
+    init: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - ../.env
+    environment:
+      - TRADING_BRIDGE_URL=http://trading-bridge:8000
+      - VNPY_BASE_URL=${VNPY_BASE_URL:-http://vnpy:8000}
+      - VNPY_USERNAME=${VNPY_USERNAME:-admin}
+      - VNPY_PASSWORD=${VNPY_PASSWORD}
+      - CHRYSANTHA_BASE_URL=http://ghostfolio:3333/api/v1
+      - CHRYSANTHA_ACCESS_TOKEN=${GHOSTFOLIO_ACCESS_TOKEN}
+    ports:
+      - "8001:8001"
+    depends_on:
+      ghostfolio:
+        condition: service_healthy
+      trading-bridge:
+        condition: service_started
+
 volumes:
   postgres:
   chrysantha-sync-logs:
