@@ -15,7 +15,7 @@ from pathlib import Path
 # Add TradingAgents to sys.path so we can import it without installing
 TRADINGAGENTS_PATH = os.environ.get(
     "TRADINGAGENTS_PATH",
-    "/app/TradingAgents",
+    "/tmp/TradingAgents",
 )
 if TRADINGAGENTS_PATH not in sys.path:
     sys.path.insert(0, TRADINGAGENTS_PATH)

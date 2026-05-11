@@ -190,21 +190,15 @@ export class InfoService {
     }
 
     try {
-      // Try seeded local dev user first, then fallback to any admin user
-      const LOCAL_DEV_USER_ID = '00000000-0000-0000-0000-000000000001';
-      const localDevUser = await this.userService.user({ id: LOCAL_DEV_USER_ID });
-      const adminUser =
-        localDevUser ??
-        (
-          await this.userService.users({
-            where: { role: 'ADMIN' },
-            orderBy: { createdAt: 'asc' },
-            take: 1
-          })
-        )[0];
+      // Find the first admin user (oldest — likely the one with data)
+      const admins = await this.userService.users({
+        where: { role: 'ADMIN' },
+        orderBy: { createdAt: 'asc' },
+        take: 1
+      });
 
-      if (adminUser) {
-        return this.jwtService.sign({ id: adminUser.id });
+      if (admins[0]) {
+        return this.jwtService.sign({ id: admins[0].id });
       }
     } catch {
       // User doesn't exist yet

@@ -25,10 +25,21 @@ def init_chrysantha_client(base_url: str, access_token: str):
     _CHRYSANTHA_BASE = base_url.rstrip("/")
     _CHRYSANTHA_TOKEN = access_token
     _CHRYSANTHA_SESSION = requests.Session()
-    _CHRYSANTHA_SESSION.headers.update({
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json",
-    })
+    _CHRYSANTHA_SESSION.headers.update({"Content-Type": "application/json"})
+
+    # Authenticate with raw access token to get a JWT
+    try:
+        resp = _CHRYSANTHA_SESSION.post(
+            f"{_CHRYSANTHA_BASE}/auth/anonymous",
+            json={"accessToken": access_token},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        jwt = resp.json().get("authToken")
+        if jwt:
+            _CHRYSANTHA_SESSION.headers["Authorization"] = f"Bearer {jwt}"
+    except Exception:
+        pass  # Fallback: chrysantha vendor will use yfinance
 
 
 def _chrysantha_get(path: str, params: dict = None) -> Optional[dict]:

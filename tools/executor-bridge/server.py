@@ -25,6 +25,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+import pandas as pd
 from fastapi import FastAPI, HTTPException
 import uvicorn
 
@@ -35,7 +36,12 @@ from models import (
     ExecutionResponse,
     ExecutionStatus,
     HealthResponse,
+    OptimizationRequest,
+    OptimizationResponse,
+    RiskCheckRequest,
+    RiskCheckResponse,
 )
+from risk_engine import check_position_size, run_hrp_optimization
 from signal_parser import parse_decision, plan_to_order_params
 from vnpy_client import get_vnpy_client
 
@@ -476,6 +482,69 @@ async def get_execution_result(execution_id: str):
         message=exec_data.get("message", ""),
         chrysantha_activity_id=exec_data.get("chrysantha_activity_id"),
         error=exec_data.get("error"),
+    )
+
+
+# ── Risk endpoints (Phase 2) ────────────────────────────────────
+
+
+@app.post("/risk/check", response_model=RiskCheckResponse)
+async def risk_check(req: RiskCheckRequest):
+    """Pre-trade risk validation.
+
+    Accepts proposed trade details and current holdings, returns
+    go/no-go decision with concentration and VaR metrics.
+    """
+    result = check_position_size(
+        holdings=req.holdings,
+        proposed_ticker=req.ticker,
+        proposed_quantity=req.quantity,
+        proposed_price=req.price,
+        max_single_position=req.max_single_position,
+        max_var_95=req.max_var_95,
+    )
+    return RiskCheckResponse(
+        approved=result.approved,
+        current_weight=result.current_weight,
+        proposed_weight=result.proposed_weight,
+        max_single_position=result.max_single_position_pct,
+        var_95_daily=result.var_95_daily,
+        cvar_95_daily=result.cvar_95_daily,
+        current_hhi=result.current_herfindahl,
+        proposed_hhi=result.proposed_herfindahl,
+        warnings=result.warnings,
+        metrics=result.metrics,
+    )
+
+
+@app.post("/risk/optimize", response_model=OptimizationResponse)
+async def risk_optimize(req: OptimizationRequest):
+    """Run portfolio optimization (HRP) and return target weights."""
+    if not req.returns:
+        raise HTTPException(status_code=400, detail="Returns data is required")
+
+    prices_df = pd.DataFrame(req.returns)
+    if prices_df.shape[1] < 2:
+        raise HTTPException(
+            status_code=400,
+            detail="Need at least 2 assets with return history",
+        )
+
+    try:
+        opt = run_hrp_optimization(
+            returns=prices_df,
+            method=req.method,
+            risk_measure=req.risk_measure,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    return OptimizationResponse(
+        weights=opt.weights,
+        risk_contribution=opt.risk_contribution,
+        expected_return=opt.expected_return,
+        expected_risk=opt.expected_risk,
+        sharpe_ratio=opt.sharpe_ratio,
     )
 
 

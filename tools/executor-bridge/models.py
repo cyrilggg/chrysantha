@@ -71,3 +71,42 @@ class HealthResponse(BaseModel):
     status: str
     vnpy: str  # "connected"|"unavailable"
     version: str = "0.1.0"
+
+
+# ── Risk models (Phase 2) ──────────────────────────────────────
+
+
+class RiskCheckRequest(BaseModel):
+    ticker: str
+    quantity: float
+    price: float
+    holdings: dict[str, dict] = Field(default_factory=dict)
+    max_single_position: float = 0.20
+    max_var_95: float = 0.02
+
+
+class RiskCheckResponse(BaseModel):
+    approved: bool
+    current_weight: float = 0.0
+    proposed_weight: float = 0.0
+    max_single_position: float = 0.20
+    var_95_daily: Optional[float] = None
+    cvar_95_daily: Optional[float] = None
+    current_hhi: Optional[float] = None
+    proposed_hhi: Optional[float] = None
+    warnings: list[str] = Field(default_factory=list)
+    metrics: dict = Field(default_factory=dict)
+
+
+class OptimizationRequest(BaseModel):
+    returns: dict[str, list[float]] = Field(default_factory=dict)
+    method: str = "HRP"
+    risk_measure: str = "CVaR"
+
+
+class OptimizationResponse(BaseModel):
+    weights: dict[str, float] = Field(default_factory=dict)
+    risk_contribution: dict[str, float] = Field(default_factory=dict)
+    expected_return: float = 0.0
+    expected_risk: float = 0.0
+    sharpe_ratio: float = 0.0
