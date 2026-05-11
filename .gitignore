@@ -4,6 +4,8 @@
 /out-tsc
 /tmp
 __pycache__/
+.venv*/
+
 
 # dependencies
 /node_modules
