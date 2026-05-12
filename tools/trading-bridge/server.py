@@ -1,18 +1,15 @@
 """
-Chrysantha ↔ TradingAgents Bridge Service
+Chrysantha ↔ TradingAgents-CN Bridge Service
 
-FastAPI server that wraps TradingAgents' multi-agent analysis pipeline,
-feeding it data from Chrysantha's database through a dynamically
-registered data vendor.
-
-Zero changes required to TradingAgents source code.
+FastAPI server that wraps TradingAgents-CN's multi-agent analysis pipeline.
+TradingAgents-CN natively supports Chinese A-share markets via AKShare/Tushare
+data sources, eliminating TLS errors from yfinance/Finnhub news fetching.
 """
 import os
 import sys
 import logging
-from pathlib import Path
 
-# Add TradingAgents to sys.path so we can import it without installing
+# Add TradingAgents-CN to sys.path so we can import it without installing
 TRADINGAGENTS_PATH = os.environ.get(
     "TRADINGAGENTS_PATH",
     "/tmp/TradingAgents",
@@ -28,16 +25,9 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import uvicorn
 
-from chrysantha_vendor import init_chrysantha_client, register_chrysantha_vendor
-
 # ── Config ─────────────────────────────────────────────────────────
 
-CHRYSANTHA_BASE_URL = os.environ.get(
-    "GHOSTFOLIO_BASE_URL", "http://ghostfolio:3333/api/v1"
-)
-CHRYSANTHA_ACCESS_TOKEN = os.environ.get("GHOSTFOLIO_ACCESS_TOKEN", "")
-
-# LLM config (defaults for TradingAgents)
+# LLM config (defaults for TradingAgents-CN)
 LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "openai")
 DEEP_THINK_MODEL = os.environ.get("DEEP_THINK_MODEL", "gpt-5.4")
 QUICK_THINK_MODEL = os.environ.get("QUICK_THINK_MODEL", "gpt-5.4-mini")
@@ -46,7 +36,6 @@ BACKEND_URL = os.environ.get("BACKEND_URL") or None
 # Analysis defaults
 MAX_DEBATE_ROUNDS = int(os.environ.get("MAX_DEBATE_ROUNDS", "1"))
 MAX_RISK_ROUNDS = int(os.environ.get("MAX_RISK_ROUNDS", "1"))
-OUTPUT_LANGUAGE = os.environ.get("OUTPUT_LANGUAGE", "Chinese")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("trading-bridge")
@@ -78,18 +67,21 @@ class AnalyzeResponse(BaseModel):
     error: str | None = None
 
 
-# ── TradingAgents wrapper ──────────────────────────────────────────
+# ── TradingAgents-CN wrapper ──────────────────────────────────────
 
 _graph_instance = None
 
+# Map TradingAgents-CN Chinese action labels to English for downstream consumers
+_ACTION_MAP = {"买入": "Buy", "卖出": "Sell", "持有": "Hold"}
+
 
 def get_graph():
-    """Lazy-init TradingAgentsGraph with chrysantha vendor registered."""
+    """Lazy-init TradingAgentsGraph with TradingAgents-CN native data sources."""
     global _graph_instance
     if _graph_instance is not None:
         return _graph_instance
 
-    logger.info("Registering chrysantha data vendor...")
+    logger.info("Initializing TradingAgents-CN graph...")
     from tradingagents.default_config import DEFAULT_CONFIG
 
     config = DEFAULT_CONFIG.copy()
@@ -100,10 +92,7 @@ def get_graph():
         config["backend_url"] = BACKEND_URL
     config["max_debate_rounds"] = MAX_DEBATE_ROUNDS
     config["max_risk_discuss_rounds"] = MAX_RISK_ROUNDS
-    config["output_language"] = OUTPUT_LANGUAGE
-    register_chrysantha_vendor(config)
 
-    logger.info("Initializing TradingAgentsGraph...")
     from tradingagents.graph.trading_graph import TradingAgentsGraph
 
     _graph_instance = TradingAgentsGraph(
@@ -115,23 +104,14 @@ def get_graph():
 
 # ── App ─────────────────────────────────────────────────────────────
 
-app = FastAPI(title="Chrysantha Trading Bridge", version="0.1.0")
+app = FastAPI(title="Chrysantha Trading Bridge (CN)", version="0.2.0")
 
 
 @app.on_event("startup")
 async def startup():
-    if not CHRYSANTHA_ACCESS_TOKEN:
-        logger.warning(
-            "GHOSTFOLIO_ACCESS_TOKEN not set — chrysantha data vendor "
-            "will fall back to yfinance for market data"
-        )
-    else:
-        init_chrysantha_client(CHRYSANTHA_BASE_URL, CHRYSANTHA_ACCESS_TOKEN)
-        logger.info("Chrysantha client initialized: %s", CHRYSANTHA_BASE_URL)
-
     # Pre-warm the graph
     get_graph()
-    logger.info("TradingAgentsGraph ready")
+    logger.info("TradingAgents-CN graph ready")
 
 
 @app.get("/health")
@@ -146,10 +126,14 @@ async def analyze(req: AnalyzeRequest):
         graph = get_graph()
         final_state, decision = graph.propagate(req.ticker, req.date)
 
+        # TradingAgents-CN returns a dict with Chinese action labels
+        action = decision.get("action", "持有")
+        signal = _ACTION_MAP.get(action, action)
+
         return AnalyzeResponse(
             ticker=req.ticker,
             date=req.date,
-            signal=decision,
+            signal=signal,
             decision={
                 "trader_plan": final_state.get("trader_investment_plan", ""),
                 "investment_plan": final_state.get("investment_plan", ""),

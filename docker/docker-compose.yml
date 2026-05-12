@@ -111,18 +111,14 @@ services:
       - DEEP_THINK_MODEL=${DEEP_THINK_MODEL:-gpt-5.4}
       - QUICK_THINK_MODEL=${QUICK_THINK_MODEL:-gpt-5.4-mini}
       - BACKEND_URL=${BACKEND_URL:-}
-      - OUTPUT_LANGUAGE=${OUTPUT_LANGUAGE:-Chinese}
-      # Chrysantha API
-      - GHOSTFOLIO_BASE_URL=${GHOSTFOLIO_BASE_URL:-http://ghostfolio:3333/api/v1}
-      - GHOSTFOLIO_ACCESS_TOKEN=${GHOSTFOLIO_ACCESS_TOKEN}
     ports:
       - "8000:8000"
     depends_on:
       ghostfolio:
         condition: service_healthy
     volumes:
-      # Mount TradingAgents source from host (fork: chrysantha-TradingAgents)
-      - ${TRADINGAGENTS_HOST_PATH:-../../TradingAgents}:/app/TradingAgents:ro
+      # Mount TradingAgents-CN source from host (Chinese market integration)
+      - ${TRADINGAGENTS_HOST_PATH:-/mnt/d/Project/TradingAgents-CN}:/app/TradingAgents:ro
 
   executor-bridge:
     build:
