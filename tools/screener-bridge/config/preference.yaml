@@ -1,0 +1,17 @@
+risk:
+  max_single_position: 0.08
+  max_sector_concentration: 0.3
+  min_market_cap_cny: 5e9
+
+blacklist_sectors:
+  - "博彩"
+  - "军工"
+
+preferred_holding_days:
+  min: 5
+  max: 20
+
+markets:
+  cn: true
+  hk: true
+  us: true

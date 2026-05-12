@@ -148,6 +148,33 @@ services:
       trading-bridge:
         condition: service_started
 
+  screener-bridge:
+    build:
+      context: ../tools/screener-bridge
+      dockerfile: Dockerfile
+    container_name: screener-bridge
+    restart: unless-stopped
+    init: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - ../.env
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ANTHROPIC_MODEL=${ANTHROPIC_MODEL:-claude-sonnet-4-6}
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - VIBE_TRADING_PATH=/app/Vibe-Trading
+    ports:
+      - "8002:8002"
+    volumes:
+      - ${VIBE_TRADING_HOST_PATH:-/mnt/d/Project/Vibe-Trading}:/app/Vibe-Trading:ro
+    depends_on:
+      redis:
+        condition: service_healthy
+
 volumes:
   postgres:
   chrysantha-sync-logs:
