@@ -27,7 +27,7 @@ class MacroRegime(BaseModel):
     indicators: dict = {}
     suggested_exposure: float = Field(ge=0.0, le=1.0)
     stale: bool = False
-    generated_at: datetime
+    generated_at: datetime = Field(default_factory=datetime.utcnow)
 
 
 class SectorScore(BaseModel):
